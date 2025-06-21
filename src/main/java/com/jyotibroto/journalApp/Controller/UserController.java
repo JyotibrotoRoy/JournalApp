@@ -3,6 +3,8 @@ package com.jyotibroto.journalApp.Controller;
 import com.jyotibroto.journalApp.Repository.UserRepository;
 import com.jyotibroto.journalApp.Service.JournalEntryService;
 import com.jyotibroto.journalApp.Service.UserService;
+import com.jyotibroto.journalApp.Service.WeatherService;
+import com.jyotibroto.journalApp.api.response.WeatherResponse;
 import com.jyotibroto.journalApp.entity.JournalEntry;
 import com.jyotibroto.journalApp.entity.User;
 import org.bson.types.ObjectId;
@@ -28,16 +30,8 @@ public class UserController{
     @Autowired
     private UserRepository userRepository;
 
-    @GetMapping
-    public ResponseEntity<?> getAllUsers(){
-        List<User> all = userService.getAll();
-        if(all != null && !all.isEmpty()){
-            return new ResponseEntity<>(all, HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
-
-
+    @Autowired
+    private WeatherService weatherService;
 
     @PutMapping
     public ResponseEntity<?> updateUser(@RequestBody User user){
@@ -57,5 +51,15 @@ public class UserController{
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         userRepository.deleteByUserName(authentication.getName());
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+    @GetMapping
+    public ResponseEntity<?> greeting() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        WeatherResponse weatherResponse = weatherService.getWeather("Kolkata");
+        String greeting = "";
+        if(weatherResponse != null) {
+            greeting = ", Today's weather feels like " + weatherResponse.getCurrent().getFeelslike();
+        }
+        return new ResponseEntity<>("hi " + authentication.getName() + greeting , HttpStatus.OK);
     }
 }
