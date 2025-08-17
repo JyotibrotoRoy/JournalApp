@@ -1,6 +1,6 @@
 package com.jyotibroto.journalApp.constants;
 
 public interface Placeholders {
-    String API_KEY = "apiKey";
-    String CITY = "city";
+    String API_KEY = "API_KEY";
+    String CITY = "CITY";
 }

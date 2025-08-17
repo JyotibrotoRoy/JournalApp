@@ -1,6 +1,7 @@
 package com.jyotibroto.journalApp.config;
 
 import com.jyotibroto.journalApp.Service.UserDetailsServiceImpl;
+import com.jyotibroto.journalApp.filter.JwtFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,10 +15,14 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    @Autowired
+    private JwtFilter jwtFilter;
 
     @Autowired
     private final UserDetailsServiceImpl userDetailsService;
@@ -33,8 +38,8 @@ public class SecurityConfig {
                 .requestMatchers("/journal/**","/user/**").authenticated()
                 .requestMatchers("/admin/**").hasRole("Admin")
                 .anyRequest().authenticated())
-                .httpBasic(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
